@@ -1,0 +1,15 @@
+[
+  "client.d.ts",
+  "client.d.ts.map",
+  "client.js",
+  "client.js.map",
+  "index.d.ts",
+  "index.d.ts.map",
+  "index.js",
+  "index.js.map",
+  "node-module-stub.js",
+  "ssr-document.d.ts",
+  "ssr-document.d.ts.map",
+  "ssr-document.js",
+  "ssr-document.js.map"
+]

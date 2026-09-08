@@ -1,42 +1,26 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "rootDir": ".",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "outDir": "./dist",
-    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "declaration": true,
-    "declarationDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@aihu/router": ["../router/src/index.ts"],
-      "@aihu/router/plugin": ["../router/src/plugin.ts"],
-      "@aihu-plugin/agent-readiness": ["../plugin-agent-readiness/src/index.ts"],
-      "@aihu/agent-service": ["../agent-service/src/index.ts"],
-      "@aihu/runtime/ssr": ["../runtime/src/ssr-string.ts"],
-      "@aihu/runtime/app": ["../runtime/src/app.ts"],
-      "@aihu/server": ["../server/src/index.ts"],
-      "@aihu/agent": ["../agent/src/index.ts"],
-      "@aihu/server/head-lowering": ["../server/src/head-lowering.ts"],
-      "@aihu/plugin": ["../plugin/src/index.ts"],
-      // src/client.ts imports BOTH `@aihu/arbor` and `@aihu/arbor/hydrate`.
-      // tsconfig `paths` matching is exact (no implicit prefix fallthrough), so
-      // the bare mapping below never covered the subpath: it resolved through
-      // package exports to ../arbor/dist/hydrate.d.ts while everything else
-      // arbor came from source. That split validates one import against a
-      // PREVIOUS build of the same package — change src/hydrate.ts's signature
-      // and this typecheck stays green until arbor is rebuilt — and it gives
-      // the two halves of arbor separate declaration identities. Map the
-      // subpath to source so the whole package resolves one way (and so tsc
-      // agrees with vitest.config.ts, which has always aliased it to src).
-      "@aihu/runtime": ["../runtime/src/index.ts"],
-      "@aihu/primitives/focus-trap": ["../primitives/src/dialog/focus-trap.ts"],
-      "@aihu/store": ["../store/src/index.ts"],
-      // Same exact-match gap as @aihu/arbor/hydrate above: src/prerender.ts
-      // imports "@aihu/context/ssr", which the bare mapping below does not
-      // cover, so it was resolving to ../context/dist/ssr.d.ts.
-      "@aihu/context/ssr": ["../context/src/ssr.ts"],
-      "@aihu/context": ["../context/src/index.ts"]
-    }
+    "declarationMap": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }
