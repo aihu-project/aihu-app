@@ -19,6 +19,8 @@ jobs:
           node-version: '24'
       - name: Install dependencies without lifecycle scripts
         run: npm ci --ignore-scripts --legacy-peer-deps
+      - name: Install unpublished peer contract fixtures
+        run: npm run prepare:peer-contract-fixtures
       - name: Build package explicitly
         run: npm run build
       - name: Build and exercise a clean isolated consumer
@@ -29,8 +31,6 @@ jobs:
           npm run test:consumer -- --tarball="$pack_dir/$tgz" --fixtures
       - name: Typecheck
         run: npm run typecheck
-      - name: Install unpublished peer contract fixtures
-        run: npm run prepare:peer-contract-fixtures
       - name: Test package
         env:
           AIHU_CONFIG_LOADER_E2E: '1'
