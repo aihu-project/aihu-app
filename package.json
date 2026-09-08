@@ -1,6 +1,6 @@
 {
   "name": "@aihu/app",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -29,34 +29,59 @@
   "scripts": {
     "build": "rolldown -c",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run build"
+    "test": "vitest run",
+    "test:release-contract": "node scripts/injected-dist-regression.mjs && node scripts/npm-credential-regression.mjs",
+    "prepare:peer-contract-fixtures": "node scripts/prepare-peer-contract-fixtures.mjs",
+    "test:consumer": "node scripts/consumer-contract.mjs",
+    "test:consumer:workers": "node scripts/consumer-workers-ssr.mjs",
+    "release:contract": "node scripts/release-contract.mjs",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "@aihu/arbor": "^4.1.2",
-    "@aihu/context": "workspace:*",
-    "@aihu/router": "workspace:*",
-    "@aihu/runtime": "workspace:*",
-    "@aihu/server": "workspace:*",
+    "@aihu/context": "^0.2.1",
+    "@aihu/router": "^0.5.0",
+    "@aihu/runtime": "^6.1.1",
+    "@aihu/server": "^0.6.0",
     "@aihu/signals": "^0.5.1",
-    "@aihu/store": "workspace:*",
-    "vite": ">=5.0.0"
+    "@aihu/store": "^0.1.2",
+    "vite": ">=5.0.0",
+    "@aihu-plugin/agent-readiness": "^2.3.0"
+  },
+  "peerDependenciesMeta": {
+    "@aihu-plugin/agent-readiness": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "@aihu/compiler": "^1.3.2"
+    "@aihu/compiler": "^1.3.6"
   },
   "devDependencies": {
-    "@aihu-plugin/agent-readiness": "workspace:*",
-    "@aihu/primitives": "workspace:*"
+    "@aihu-plugin/agent-readiness": "^2.3.0",
+    "@aihu/primitives": "^0.2.3",
+    "@types/node": "^20.16.5",
+    "jsdom": "^25.0.1",
+    "rolldown": "^1.0.0-rc.17",
+    "rolldown-plugin-dts": "^0.23.2",
+    "typescript": "^5.6.2",
+    "vite": "^8.0.16",
+    "vitest": "^3.2.6"
   },
-  "description": "Top-level app integration \u2014 wires runtime, router, and adapters into a Vite app.",
+  "description": "Top-level app integration — wires runtime, router, and adapters into a Vite app.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aihu-project/aihu.git",
-    "directory": "packages/app"
+    "url": "git+https://github.com/aihu-project/aihu-app.git"
   },
-  "homepage": "https://github.com/aihu-project/aihu/tree/main/packages/app#readme",
-  "bugs": "https://github.com/aihu-project/aihu/issues",
+  "homepage": "https://github.com/aihu-project/aihu-app#readme",
+  "bugs": {
+    "url": "https://github.com/aihu-project/aihu-app/issues"
+  },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": ""
 }

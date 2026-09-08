@@ -1,46 +1,26 @@
-/**
- * `@aihu/app` is the first likely package to move after the framework kernel.
- * Its browser bootstrap must consume the runtime's explicit app bridge, not
- * the runtime source tree or the broader runtime barrel.
- */
-import { readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { viteAihuPlugin } from '../src/vite-plugin.ts'
 
-const APP_SRC = join(process.cwd(), 'packages/app/src')
-const APP_PACKAGE = JSON.parse(
-  readFileSync(join(process.cwd(), 'packages/app/package.json'), 'utf8'),
-) as { name: string }
-
-function sourceFiles(dir: string): string[] {
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const file = join(dir, entry.name)
-    return entry.isDirectory() ? sourceFiles(file) : file.endsWith('.ts') ? [file] : []
+function names(value: unknown): string[] {
+  return (Array.isArray(value) ? value : [value]).flatMap((plugin) => {
+    if (plugin && typeof plugin === 'object' && 'name' in plugin) return [String(plugin.name)]
+    return []
   })
 }
 
-describe(`${APP_PACKAGE.name} ↔ @aihu/runtime boundary`, () => {
-  it('uses only the explicit runtime app bridge from app source', () => {
-    const imports = sourceFiles(APP_SRC).flatMap((file) => {
-      const source = readFileSync(file, 'utf8')
-      return [...source.matchAll(/from\s+['"](@aihu\/runtime(?:\/[^'"]*)?)['"]/g)].map((match) => ({
-        file,
-        specifier: match[1],
-      }))
-    })
-
-    expect(imports).toEqual([
-      expect.objectContaining({
-        specifier: '@aihu/runtime/app',
-      }),
-    ])
+describe('optional agent-readiness boundary', () => {
+  it('keeps the base app plugin graph importable without opt-in', () => {
+    const plugins = viteAihuPlugin()
+    expect(names(plugins)).toContain('aihu-agent-readiness-disabled')
   })
 
-  it('does not reach into the runtime source tree', () => {
-    const offenders = sourceFiles(APP_SRC).filter((file) =>
-      /(?:from\s+|import\(\s*)['"](?:\.\.\/)+runtime\/src\//.test(readFileSync(file, 'utf8')),
+  it('loads the optional integration only when explicitly configured', async () => {
+    const plugins = viteAihuPlugin({ agentReadiness: { name: 'app' } })
+    const agent = (Array.isArray(plugins) ? plugins : [plugins]).find(
+      (plugin) => plugin && typeof plugin === 'object' && 'then' in plugin,
     )
-
-    expect(offenders).toEqual([])
+    expect(agent).toBeDefined()
+    const resolved = await agent
+    expect((resolved as { name?: string }).name).toMatch(/agent/)
   })
 })

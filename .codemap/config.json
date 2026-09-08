@@ -1,0 +1,28 @@
+{
+  "only": ["ts", "mjs", "js", "json", "yml", "yaml", "md"],
+  "exclude": ["node_modules", "dist", "coverage", "pack"],
+  "depth": 4,
+  "budgets": {},
+  "routing": {
+    "subsystems": [
+      {
+        "name": "app-package-boundary",
+        "paths": ["package.json", "rolldown.config.ts", "src/**/*.ts", "tests/**/*.ts"],
+        "keywords": ["@aihu/app", "@aihu/runtime/app", "virtual:aihu-routes", "virtual:aihu-layouts"],
+        "docs": ["README.md"],
+        "note": "The app package composes build-time and runtime imports through package-name and virtual-module strings; Codemap cannot follow those resolver contracts across a consumer's Vite graph. The standalone consumer gate exercises the published exports."
+      },
+      {
+        "name": "release-artifact-boundary",
+        "paths": ["package.json", "scripts/release-contract.mjs", ".github/workflows/release.yml"],
+        "keywords": ["--provenance", "id-token: write", "workspace:", "app-v"],
+        "docs": ["README.md"],
+        "note": "The manifest, release script, and workflow form a non-imported contract for the exact published artifact; Codemap cannot follow CI strings, npm auth policy, or tarball allowlists."
+      }
+    ]
+  },
+  "drift": {
+    "require_docs_for": ["app-package-boundary", "release-artifact-boundary"]
+  },
+  "guidance": {}
+}

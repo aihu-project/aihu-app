@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+.npm/
+pack/
+.codemap/*
+!.codemap/config.json

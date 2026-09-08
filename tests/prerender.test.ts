@@ -791,6 +791,10 @@ describe('prerenderClose — loads real route modules via Vite SSR', () => {
 // `<router>` does, and there is no `<router>` here — so pre-population is the
 // only mechanism, and these tests are what prove it survives to the walk.
 
+// These assertions run against the explicit @aihu/context 0.2.1 peer contract
+// fixture in CI until that standalone release is published. The release gate
+// separately checks the registry prerequisite, so a green fixture run cannot
+// be mistaken for current registry compatibility.
 describe('runPrerender — route context', () => {
   let fx: Fixture
   afterEach(async () => {

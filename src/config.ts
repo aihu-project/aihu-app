@@ -153,8 +153,17 @@ export type VitePassthrough = Omit<UserConfig, 'plugins'>
 /** A Aihu plugin is structurally identical to a Vite plugin (V0). */
 export type AihuPlugin = Plugin
 
-/** Type-only import — not bundled when agentReadiness is absent. */
-export type AgentReadinessConfig = import('@aihu-plugin/agent-readiness').AgentReadinessConfig
+/**
+ * Structural opt-in configuration. Kept local so importing the base app's
+ * public types never requires the optional agent-readiness package. The
+ * integration validates and narrows the complete shape when it is installed.
+ */
+export interface AgentReadinessConfig {
+  readonly name: string
+  readonly version?: string
+  readonly summary?: string
+  readonly [key: string]: unknown
+}
 
 /**
  * CSS / styling options forwarded to the compiler's Vite plugin.

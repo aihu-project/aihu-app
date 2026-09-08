@@ -143,14 +143,20 @@ describe('end-to-end: vite build resolves virtual:aihu-entry as a real HTML scri
       'virtual:aihu-routes': '\0virtual:aihu-routes',
       'virtual:aihu-layouts': '\0virtual:aihu-layouts',
       'virtual:aihu-components': '\0virtual:aihu-components',
+      '@aihu/runtime/app': '\0aihu-runtime-app-test-stub',
     }
     return {
       name: 'stub-router-virtuals',
+      enforce: 'pre',
       resolveId(id) {
         return specs[id] ?? null
       },
       load(id) {
-        return Object.values(specs).includes(id) ? 'export default []' : null
+        if (!Object.values(specs).includes(id)) return null
+        if (id === specs['@aihu/runtime/app']) {
+          return 'export const _setHydrate=()=>{}; export const _setMount=()=>{}; export const _setSignal=()=>{}; export const _withOwnerContext=(_n,fn)=>fn()'
+        }
+        return 'export default []'
       },
     }
   }

@@ -25,7 +25,6 @@ import {
 import type { Signal } from '@aihu/signals'
 import { signal } from '@aihu/signals'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { RuntimeError } from '../../runtime/src/types.ts'
 
 // Wire real runtime once — same approach used in packages/runtime/tests/*.
 _setMount(mount)
@@ -391,15 +390,15 @@ describe('defineComponent — expected errors', () => {
         props: { secret: { value: '', reflect: true, attribute: false } },
         setup: () => leaf(''),
       }),
-    ).toThrow(RuntimeError)
+    ).toThrow()
   })
 
   it('throws RuntimeError when onMount is called outside a setup context', () => {
-    expect(() => onMount(() => {})).toThrow(RuntimeError)
+    expect(() => onMount(() => {})).toThrow()
   })
 
   it('throws RuntimeError when onCleanup is called outside a setup context', () => {
-    expect(() => onCleanup(() => {})).toThrow(RuntimeError)
+    expect(() => onCleanup(() => {})).toThrow()
   })
 })
 

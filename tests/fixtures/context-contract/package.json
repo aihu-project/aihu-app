@@ -1,0 +1,9 @@
+{
+  "name": "@aihu/context",
+  "version": "0.2.1",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./ssr": "./ssr.js"
+  }
+}

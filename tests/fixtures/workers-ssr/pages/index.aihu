@@ -11,5 +11,7 @@
     <probe-extends />
     <probe-recipe />
     <probe-define />
+    <probe-missing />
+    <probe-poison />
   </main>
 }
