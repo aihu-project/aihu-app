@@ -13,8 +13,13 @@ const consumer = mkdtempSync(join(process.env.RUNNER_TEMP ?? tmpdir(), 'aihu-app
 
 writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
 const registryPeers = [
+  // Keep registry peers in this first transaction. A later no-save install can
+  // prune the app's earlier peer packages and make the gate depend on npm's
+  // install ordering rather than the published contract.
   '@aihu/arbor@4.1.2',
+  ...(!fixtureMode ? ['@aihu/context@0.2.1'] : []),
   '@aihu/router@0.5.0',
+  ...(!fixtureMode ? ['@aihu/runtime@6.1.1'] : []),
   '@aihu/server@0.6.0',
   '@aihu/signals@0.5.1',
   '@aihu/store@0.1.2',
@@ -30,12 +35,6 @@ if (fixtureMode) {
     const target = join(consumer, 'node_modules', name)
     mkdirSync(dirname(target), { recursive: true })
     cpSync(join(root, 'tests', 'fixtures', fixture), target, { recursive: true, force: true })
-  }
-} else {
-  for (const spec of ['@aihu/context@0.2.1', '@aihu/runtime@6.1.1']) {
-    execFileSync('npm', ['install', '--ignore-scripts', '--no-package-lock', '--prefix', consumer, spec], {
-      stdio: 'inherit', env: { ...process.env, NPM_CONFIG_USERCONFIG: '/dev/null' },
-    })
   }
 }
 

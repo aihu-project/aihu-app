@@ -33,6 +33,7 @@
     "test:release-contract": "node scripts/injected-dist-regression.mjs && node scripts/npm-credential-regression.mjs",
     "prepare:peer-contract-fixtures": "node scripts/prepare-peer-contract-fixtures.mjs",
     "test:consumer": "node scripts/consumer-contract.mjs",
+    "test:consumer:workers": "node scripts/consumer-workers-ssr.mjs",
     "release:contract": "node scripts/release-contract.mjs",
     "prepublishOnly": "npm run build"
   },

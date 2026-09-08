@@ -74,6 +74,10 @@ jobs:
           TGZ: ${{ steps.pack.outputs.tgz }}
         run: |
           npm run test:consumer -- --tarball="$TGZ"
+      - name: Verify packaged Workers SSR consumer against registry peers
+        env:
+          TGZ: ${{ steps.pack.outputs.tgz }}
+        run: npm run test:consumer:workers -- --tarball="$TGZ"
       - name: Publish the exact verified tarball with provenance
         env:
           TGZ: ${{ steps.pack.outputs.tgz }}

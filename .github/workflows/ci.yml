@@ -29,6 +29,7 @@ jobs:
           mkdir -p "$pack_dir"
           tgz="$(npm pack --ignore-scripts --pack-destination "$pack_dir" | tail -1)"
           npm run test:consumer -- --tarball="$pack_dir/$tgz" --fixtures
+          npm run test:consumer:workers -- --tarball="$pack_dir/$tgz"
       - name: Typecheck
         run: npm run typecheck
       - name: Test package
