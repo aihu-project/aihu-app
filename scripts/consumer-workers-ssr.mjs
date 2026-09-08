@@ -1,39 +1,21 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve, sep } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { join, resolve, sep } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 /**
  * Release gate for the packaged app's Workers SSR path.
  *
  * This deliberately runs outside Vitest and never imports this repository's
- * source. The app tarball, plus the candidate context/runtime releases, are
- * installed into a fresh consumer and the only framework entry is resolved
- * from that consumer's node_modules.
+ * source. The app tarball plus its published context/runtime peer floors are
+ * installed into a fresh consumer, and every framework entry is resolved from
+ * that consumer's node_modules.
  */
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const appArg = process.argv.find((value) => value.startsWith('--tarball='))
 if (!appArg) throw new Error('consumer-workers-ssr requires --tarball=/absolute/path/package.tgz')
 const appTarball = resolve(appArg.slice('--tarball='.length))
 const consumer = mkdtempSync(join(process.env.RUNNER_TEMP ?? tmpdir(), 'aihu-app-workers-consumer-'))
-const packDir = mkdtempSync(join(process.env.RUNNER_TEMP ?? tmpdir(), 'aihu-app-peer-packs-'))
-const fixtureRoot = join(root, 'tests', 'fixtures')
-
-function packFixture(name) {
-  const fixture = join(fixtureRoot, name)
-  const output = execFileSync('npm', ['pack', '--ignore-scripts', '--pack-destination', packDir], {
-    cwd: fixture,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'inherit'],
-    env: { ...process.env, NPM_CONFIG_USERCONFIG: '/dev/null' },
-  }).trim().split(/\r?\n/).at(-1)
-  if (!output) throw new Error(`npm pack produced no tarball for ${name}`)
-  return join(packDir, output)
-}
-
-const contextTarball = packFixture('context-contract')
-const runtimeTarball = packFixture('runtime-contract')
 writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
 
 // Install every package in one transaction. npm otherwise may prune a packed
@@ -41,7 +23,9 @@ writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true, ty
 // install ordering rather than proving the published package contract.
 const registryPeers = [
   '@aihu/arbor@4.1.2',
+  '@aihu/context@0.2.1',
   '@aihu/router@0.5.0',
+  '@aihu/runtime@6.1.1',
   '@aihu/server@0.6.0',
   '@aihu/signals@0.5.1',
   '@aihu/store@0.1.2',
@@ -49,7 +33,7 @@ const registryPeers = [
 ]
 execFileSync('npm', [
   'install', '--ignore-scripts', '--legacy-peer-deps', '--no-package-lock', '--prefix', consumer,
-  appTarball, contextTarball, runtimeTarball, ...registryPeers,
+  appTarball, ...registryPeers,
 ], { stdio: 'inherit', env: { ...process.env, NPM_CONFIG_USERCONFIG: '/dev/null' } })
 
 const nodeModules = join(consumer, 'node_modules')
@@ -174,13 +158,15 @@ const response = await requestFromWorker('main')
 const html = await response.text()
 if (response.status !== 200) throw new Error(`main SSR request returned ${response.status}: ${html}`)
 if (!html.includes('id="app-root"') || !html.includes('packaged consumer ssr')) throw new Error('custom outlet document was not assembled')
-if (html.includes('probe-missing')) throw new Error('missing registry entry leaked into rendered HTML')
+if (!html.includes('registered card')) throw new Error('registered component content was not rendered')
+if (!/<probe-missing\b[^>]*><\/probe-missing>/.test(html)) throw new Error('missing registry entry did not render as an empty hydration element')
 
 build({ AIHU_CONSUMER_POISON: '1' })
 const poisoned = await requestFromWorker('poison')
 const poisonedHtml = await poisoned.text()
 if (poisoned.status !== 200) throw new Error(`poisoned registry request returned ${poisoned.status}: ${poisonedHtml}`)
 if (!poisonedHtml.includes('packaged consumer ssr')) throw new Error('poisoned registry removed the working route')
+if (!/<probe-poison\b[^>]*><\/probe-poison>/.test(poisonedHtml)) throw new Error('poisoned registry entry did not degrade to an empty hydration element')
 
 // The packaged gate must remain source-independent. Keep the assertions in the
 // script so a future shortcut to ../../../src or a fixture alias fails loudly.
