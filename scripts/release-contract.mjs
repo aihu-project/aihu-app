@@ -27,6 +27,9 @@ for (const group of ['dependencies', 'devDependencies', 'optionalDependencies', 
 
 assert(manifest.name === '@aihu/app', 'package name must remain @aihu/app')
 assert(manifest.version === '10.0.1', `expected prepared patch version 10.0.1, got ${manifest.version}`)
+assert(manifest.peerDependencies?.['@aihu/context'] === '^0.2.1', 'context 0.2.1 is the minimum supported SSR context contract')
+assert(manifest.peerDependencies?.['@aihu/runtime'] === '^6.1.1', 'runtime 6.1.1 is the minimum supported app subpath contract')
+assert(manifest.peerDependenciesMeta?.['@aihu-plugin/agent-readiness']?.optional === true, 'agent-readiness must remain an optional peer')
 assert(JSON.stringify(manifest.files) === JSON.stringify(['dist', 'README.md', 'LICENSE']), 'files allowlist changed')
 for (const [subpath, target] of Object.entries({
   '.': './dist/index.js',

@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
       - name: Check npm trusted publishing prerequisites
@@ -35,6 +35,10 @@ jobs:
           test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
           prs="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" --jq '[.[] | select(.state == "closed" and .merged_at != null and .base.ref == "main")] | length')"
           test "$prs" -ge 1
+      - name: Check published peer prerequisites
+        run: |
+          npm view @aihu/context@0.2.1 version
+          npm view @aihu/runtime@6.1.1 version
       - name: Install dependencies without lifecycle scripts
         run: npm ci --ignore-scripts
       - name: Build package explicitly
@@ -42,7 +46,7 @@ jobs:
       - name: Typecheck and test package
         run: |
           npm run typecheck
-          npm test
+          AIHU_CONFIG_LOADER_E2E=1 npm test
           npm run test:release-contract
       - name: Check release contract
         run: npm run release:contract
@@ -69,11 +73,7 @@ jobs:
         env:
           TGZ: ${{ steps.pack.outputs.tgz }}
         run: |
-          consumer="$RUNNER_TEMP/aihu-app-consumer"
-          mkdir -p "$consumer"
-          npm init --yes --prefix "$consumer"
-          npm install --prefix "$consumer" "$TGZ" --ignore-scripts
-          (cd "$consumer" && CONSUMER_ROOT="$consumer" node --input-type=module --eval "import { realpathSync } from 'node:fs'; import { fileURLToPath } from 'node:url'; import { sep } from 'node:path'; const root = realpathSync(process.env.CONSUMER_ROOT); for (const name of ['@aihu/app', '@aihu/app/client', '@aihu/app/ssr-document']) { const file = realpathSync(fileURLToPath(await import.meta.resolve(name))); if (!file.startsWith(root + sep)) throw new Error(name + ' resolved outside isolated consumer: ' + file); console.log(name + ' -> ' + file); }")
+          npm run test:consumer -- --tarball="$TGZ"
       - name: Publish the exact verified tarball with provenance
         env:
           TGZ: ${{ steps.pack.outputs.tgz }}

@@ -7,12 +7,7 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['tests/**/*.test.ts'],
     passWithNoTests: false,
-    exclude: [
-      '**/node_modules/**',
-      'tests/route-context.test.ts',
-      'tests/runtime-boundary.test.ts',
-      'tests/workers-ssr-e2e.test.ts',
-    ],
+    exclude: ['**/node_modules/**'],
   },
   resolve: {
     alias: {

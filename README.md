@@ -74,12 +74,13 @@ bun add @aihu/app
 **Peer dependencies:**
 
 - `@aihu/arbor` — `^4.1.2`
-- `@aihu/context` — `^0.2.0`
+- `@aihu/context` — `^0.2.1`
 - `@aihu/router` — `^0.5.0`
-- `@aihu/runtime` — `^6.1.0`
+- `@aihu/runtime` — `^6.1.1`
 - `@aihu/server` — `^0.6.0`
 - `@aihu/signals` — `^0.5.1`
 - `@aihu/store` — `^0.1.2`
+- `@aihu-plugin/agent-readiness` — `^2.3.0` (optional; opt in with `agentReadiness`)
 - `vite` — `>=5.0.0`
 
 <sub><i>Package version `@aihu/app@10.0.1`.</i></sub>
@@ -110,6 +111,11 @@ MIT — see [LICENSE](../../LICENSE).
 <sub><i>Package version `@aihu/app@10.0.1`.</i></sub>
 
 ## Release procedure
+
+Publish `@aihu/context@0.2.1` and `@aihu/runtime@6.1.1` first; these are release
+prerequisites for the app's context and `@aihu/runtime/app` contracts. The local
+and pull-request gates use explicit packed fixtures until those versions exist in
+the registry, and do not claim registry compatibility before then.
 
 Merge the reviewed change to `main`, update the package version, and verify the
 default branch locally. Then create and push the exact annotated tag
