@@ -1,5 +1,12 @@
 # @aihu/app
 
+## 10.0.1
+
+### Patch Changes
+
+- Extracted `@aihu/app` into the standalone `aihu-project/aihu-app` repository.
+- Kept the public API and peer-dependency surface unchanged.
+
 ## 10.0.0
 
 ### Minor Changes
