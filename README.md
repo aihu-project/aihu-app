@@ -106,7 +106,7 @@ bun add @aihu/app
 <!-- BEGIN_AUTOGEN: license -->
 <!-- regenerate: bun scripts/sync-readme.ts (also runs in pre-commit + CI) -->
 
-MIT — see [LICENSE](../../LICENSE).
+MIT — see [LICENSE](LICENSE).
 
 <sub><i>Package version `@aihu/app@10.0.1`.</i></sub>
 
